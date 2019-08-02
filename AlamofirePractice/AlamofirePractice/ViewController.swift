@@ -7,6 +7,7 @@
 //
 
 import UIKit
+
 // import Library
 import Alamofire
 
@@ -16,17 +17,44 @@ class ViewController: UIViewController {
   
   let urlString = "https://httpbin.org/get"
   
+  lazy var imageView: UIImageView = {
+    let imageView = UIImageView()
+    imageView.backgroundColor = .blue
+    imageView.contentMode = UIImageView.ContentMode.scaleAspectFill
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    return imageView
+  }()
+  
   // MARK:- View Life Cycle
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    makingARequestWithAlamofire()
-    responseHandling()
-    responseManualValidation()
-    responseAutomaticValidation()
-    httpMethodsTest()
-    getRequestWithUrlEncodedParameters()
-    postRequestWithJsonEncodedParameters()
+    view.backgroundColor = .white
+    setupView()
+    setupLayout()
+    
+//    makingARequestWithAlamofire()
+//    responseHandling()
+//    responseManualValidation()
+//    responseAutomaticValidation()
+//    httpMethodsTest()
+//    getRequestWithUrlEncodedParameters()
+//    postRequestWithJsonEncodedParameters()
+//    httpBasicAuthentication()
+    downloadDataToFile()
+  }
+  
+  func setupView() {
+    view.addSubview(imageView)
+  }
+  
+  func setupLayout() {
+    NSLayoutConstraint.activate([
+      imageView.topAnchor.constraint(equalTo: view.topAnchor),
+      imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+      ])
   }
   
   //: Making a Request
@@ -130,6 +158,35 @@ class ViewController: UIViewController {
     // Both calls are equivalent
     Alamofire.request("https://httpbin.org/post", method: .post, parameters: parameters, encoding: JSONEncoding.default)
     Alamofire.request("https://httpbin.org/post", method: .post, parameters: parameters, encoding: JSONEncoding(options: []))
+  }
+  
+  //: HTTP Basic Authentication
+  func httpBasicAuthentication() {
+    let user = "user"
+    let password = "password"
+    
+    var headers: HTTPHeaders = [:]
+    if let authorizationHeader = Request.authorizationHeader(user: user, password: password) {
+      headers[authorizationHeader.key] = authorizationHeader.value
+    }
+    
+    Alamofire.request("https://httpbin.org/basic-auth/user/password)", headers: headers)
+      .responseJSON { response in
+        debugPrint(response)
+    }
+  }
+  
+  //: Downloading Data to a File
+  func downloadDataToFile() {
+    Alamofire.download("https://httpbin.org/image/png").responseData { response in
+      if let data = response.result.value {
+        print(data)
+        if let image = UIImage(data: data) {
+          print(image)
+          self.imageView.image = image
+        }
+      }
+    }
   }
 }
 
