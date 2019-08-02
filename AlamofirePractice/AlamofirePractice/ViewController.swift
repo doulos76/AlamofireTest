@@ -41,7 +41,8 @@ class ViewController: UIViewController {
 //    getRequestWithUrlEncodedParameters()
 //    postRequestWithJsonEncodedParameters()
 //    httpBasicAuthentication()
-    downloadDataToFile()
+//    downloadDataToFile()
+    urlSessionTaskMatrics()
   }
   
   func setupView() {
@@ -186,6 +187,13 @@ class ViewController: UIViewController {
           self.imageView.image = image
         }
       }
+    }
+  }
+  
+  //: URL Session Task Matrics
+  func urlSessionTaskMatrics() {
+    Alamofire.request("https://httpbin.org/get").responseJSON { response in
+      print(response.metrics)
     }
   }
 }
